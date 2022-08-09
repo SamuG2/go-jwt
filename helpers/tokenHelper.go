@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -57,6 +58,32 @@ func GenerateAllTokens(email string, first_name string, last_name string, userTy
 
 }
 
+func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
+	token, err := jwt.ParseWithClaims(
+		signedToken,
+		&SignedDetails{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(SECRET_KEY), nil
+		},
+	)
+	if err != nil {
+		msg = err.Error()
+		return
+	}
+	claims, ok := token.Claims.(*SignedDetails)
+	if !ok {
+		msg = fmt.Sprintf("the token is invalid")
+		msg = err.Error()
+		return
+	}
+	if claims.ExpiresAt < time.Now().Local().Unix() {
+		msg = fmt.Sprintf("token expired")
+		msg = err.Error()
+		return
+	}
+	return claims, msg
+}
+
 func UpdateAllTokens(token string, refreshToken string, userId string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
@@ -83,6 +110,4 @@ func UpdateAllTokens(token string, refreshToken string, userId string) {
 	if err != nil {
 		log.Panic(err)
 	}
-	return
-
 }
