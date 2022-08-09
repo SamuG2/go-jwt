@@ -1,8 +1,9 @@
 package main
 
 import (
-	routes "go-jwt/routes"
 	"os"
+
+	routes "github.com/SamuG2/go-jwt/routes"
 
 	"github.com/gin-gonic/gin"
 )
