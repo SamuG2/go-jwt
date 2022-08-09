@@ -1,1 +1,1 @@
-API para JWTs con Golang
+API para JWTs con Golang siguiendo tutorial de https://www.youtube.com/watch?v=Cr3BiwGN2Tg
