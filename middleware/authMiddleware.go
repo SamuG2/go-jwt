@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	helper "github.com/SamuG2/go-jwt/helpers"
@@ -27,6 +28,7 @@ func Authenticate() gin.HandlerFunc {
 		c.Set("last_name", claims.Last_name)
 		c.Set("uid", claims.Uid)
 		c.Set("user_type", claims.UserType)
+		fmt.Println("User type:", claims.UserType)
 		c.Next()
 
 	}

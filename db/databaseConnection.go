@@ -12,6 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+func getDatabase() string {
+	database := os.Getenv("MONGODB_DATABASE")
+	return database
+}
+
 func DBinstance() *mongo.Client {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -36,8 +41,9 @@ func DBinstance() *mongo.Client {
 }
 
 var Client *mongo.Client = DBinstance()
+var Database string = getDatabase()
 
 func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	var collection *mongo.Collection = client.Database("").Collection(collectionName)
+	var collection *mongo.Collection = client.Database(Database).Collection(collectionName)
 	return collection
 }

@@ -27,7 +27,7 @@ type SignedDetails struct {
 var userCollection *mongo.Collection = db.OpenCollection(db.Client, "user")
 var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
-func GenerateAllTokens(email string, first_name string, last_name string, userType string, user_id string) (token string, refreshToken string, err error) {
+func GenerateAllTokens(email string, first_name string, last_name string, userType string, user_id string) (signedToken string, signedRefreshToken string, err error) {
 	claims := &SignedDetails{
 		Email:      email,
 		First_name: first_name,
@@ -44,17 +44,18 @@ func GenerateAllTokens(email string, first_name string, last_name string, userTy
 		},
 	}
 
-	token, err = jwt.NewWithClaims(jwt.SigningMethodES256, claims).SignedString([]byte(SECRET_KEY))
-	if err != nil {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	if signedToken, err = token.SignedString([]byte(SECRET_KEY)); err != nil {
 		log.Panic(err)
 		return
 	}
-	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodES256, refreshClaims).SignedString([]byte(SECRET_KEY))
-	if err != nil {
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS512, refreshClaims)
+	if signedRefreshToken, err = refreshToken.SignedString([]byte(SECRET_KEY)); err != nil {
 		log.Panic(err)
 		return
 	}
-	return token, refreshToken, err
+	return signedToken, signedRefreshToken, err
 
 }
 
@@ -66,11 +67,13 @@ func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
 			return []byte(SECRET_KEY), nil
 		},
 	)
+
 	if err != nil {
 		msg = err.Error()
 		return
 	}
 	claims, ok := token.Claims.(*SignedDetails)
+	fmt.Printf("%+v\n", claims)
 	if !ok {
 		msg = fmt.Sprintf("the token is invalid")
 		msg = err.Error()

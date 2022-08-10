@@ -147,6 +147,7 @@ func Login() gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
+		//trimmedUser := models.ExportedUser{User: foundUser}
 		c.JSON(http.StatusOK, foundUser)
 	}
 }
